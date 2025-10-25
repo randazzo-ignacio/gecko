@@ -34,6 +34,7 @@ map_characteristics() {
 map_oh_magic() {
   case "$1" in
     "010b") echo "PE32";;
+    "0107") echo "ROM";;
     "020b") echo "PE32+";;
     *) echo "ERROR";;
   esac

@@ -48,5 +48,31 @@ if [ $(hex2int ${optional_header_size}) -ne 0 ]; then
   oh_magic=$(get_bytes_le $(($(offset_optional_header))) 2)
   field_print "Optional Header Magic" ${oh_magic} map_oh_magic
 
+  if [ $(map_oh_magic ${oh_magic}) != "PE32+" ]; then
+    echo "Unimplemented format";
+    exit 1
+  else
+    ohsf_major=$(get_bytes_le $((2+$(offset_optional_header))) 1)
+    field_print "Major Linker version" ${ohsf_major} hex2int
+
+    ohsf_minor=$(get_bytes_le $((3+$(offset_optional_header))) 1)
+    field_print "Minor Linker version" ${ohsf_minor} hex2int
+
+    ohsf_code_size=$(get_bytes_le $((4+$(offset_optional_header))) 4)
+    field_print "Code Size" ${ohsf_code_size} hex2int
+
+    ohsf_initdata_size=$(get_bytes_le $((8+$(offset_optional_header))) 4)
+    field_print "Initialized Data Size" ${ohsf_initdata_size} hex2int
+
+    ohsf_uninitdata_size=$(get_bytes_le $((12+$(offset_optional_header))) 4)
+    field_print "Uninitialized Data Size" ${ohsf_uninitdata_size} hex2int
+
+    ohsf_entrypoint_address=$(get_bytes_le $((16+$(offset_optional_header))) 4)
+    field_print "Address of Entry point" ${ohsf_entrypoint_address} hex2int
+
+    ohsf_codebase=$(get_bytes_le $((20+$(offset_optional_header))) 4)
+    field_print "Base of Code" ${ohsf_codebase} hex2int
+  fi
+
   eyecandy_end
 fi

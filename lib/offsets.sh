@@ -12,10 +12,6 @@ offset_optional_header() {
   echo $((20+$(offset_coff)))
 }
 
-offset_optional_header_standard() {
-  echo $((2+$(offset_optional_header)))
-}
-
 offset_debug_static() {
   eyecandy_start "Static Offsets"
   echo "Signature offset: $(offset_signature)"

@@ -52,6 +52,8 @@ if [ $(hex2int ${optional_header_size}) -ne 0 ]; then
     echo "Unimplemented format";
     exit 1
   else
+    eyecandy_start "Optional Header Standard Fields (Image)"
+
     ohsf_major=$(get_bytes_le $((2+$(offset_optional_header))) 1)
     field_print "Major Linker version" ${ohsf_major} hex2int
 
@@ -72,6 +74,56 @@ if [ $(hex2int ${optional_header_size}) -ne 0 ]; then
 
     ohsf_codebase=$(get_bytes_le $((20+$(offset_optional_header))) 4)
     field_print "Base of Code" ${ohsf_codebase} hex2int
+
+    eyecandy_end
+    eyecandy_start "Optional Header Standard Fields (Image)"
+
+    ohwsf_image_base=$(get_bytes_le $((24+$(offset_optional_header))) 8)
+    field_print "Image base" ${ohwsf_image_base} hex2int
+
+    ohwsf_section_alignment=$(get_bytes_le $((32+$(offset_optional_header))) 4)
+    field_print "Section Alignment" ${ohwsf_section_alignment} hex2int
+
+    ohwsf_file_alignment=$(get_bytes_le $((36+$(offset_optional_header))) 4)
+    field_print "File Alignment" ${ohwsf_file_alignment} hex2int
+
+    ohwsf_major_os_version=$(get_bytes_le $((40+$(offset_optional_header))) 2)
+    field_print "Major OS Version" ${ohwsf_major_os_version} hex2int
+
+    ohwsf_minor_os_version=$(get_bytes_le $((42+$(offset_optional_header))) 2)
+    field_print "Minor OS Version" ${ohwsf_minor_os_version} hex2int
+
+    ohwsf_major_image_version=$(get_bytes_le $((44+$(offset_optional_header))) 2)
+    field_print "Major Image Version" ${ohwsf_major_image_version} hex2int
+
+    ohwsf_minor_image_version=$(get_bytes_le $((46+$(offset_optional_header))) 2)
+    field_print "Minor Image Version" ${ohwsf_minor_image_version} hex2int
+
+    ohwsf_major_subsystem_version=$(get_bytes_le $((48+$(offset_optional_header))) 2)
+    field_print "Major Subsystem Version" ${ohwsf_major_subsystem_version} hex2int
+
+    ohwsf_minor_subsystem_version=$(get_bytes_le $((50+$(offset_optional_header))) 2)
+    field_print "Minor Subsystem Version" ${ohwsf_minor_subsystem_version} hex2int
+
+    ohwsf_win32_version=$(get_bytes_le $((52+$(offset_optional_header))) 4)
+    field_print "Reserved win32 version value, must be zero" ${ohwsf_minor_subsystem_version} hex2int
+
+    ohwsf_image_size=$(get_bytes_le $((56+$(offset_optional_header))) 4)
+    field_print "Size of Image" ${ohwsf_image_size} hex2int
+
+    ohwsf_headers_size=$(get_bytes_le $((60+$(offset_optional_header))) 4)
+    field_print "Size of Headers" ${ohwsf_headers_size} hex2int
+
+    ohwsf_checksum=$(get_bytes_le $((64+$(offset_optional_header))) 4)
+    field_print "Checksum" ${ohwsf_checksum}
+
+    ohwsf_subsystem=$(get_bytes_le $((68+$(offset_optional_header))) 2)
+    field_print "Subsystem" ${ohwsf_subsystem} map_subsystem
+
+    ohwsf_dll_characteristics=$(get_bytes_le $((70+$(offset_optional_header))) 2)
+    field_print "DLL Characteristics" ${ohwsf_dll_characteristics} map_dll_characteristics
+
+    eyecandy_end
   fi
 
   eyecandy_end

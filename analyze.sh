@@ -123,7 +123,73 @@ if [ $(hex2int ${optional_header_size}) -ne 0 ]; then
     ohwsf_dll_characteristics=$(get_bytes_le $((70+$(offset_optional_header))) 2)
     field_print "DLL Characteristics" ${ohwsf_dll_characteristics} map_dll_characteristics
 
+    ohwsf_stack_reserve_size=$(get_bytes_le $((72+$(offset_optional_header))) 8)
+    field_print "Size of Stack Reserve" ${ohwsf_stack_reserve_size} hex2int
+
+    ohwsf_stack_commit_size=$(get_bytes_le $((80+$(offset_optional_header))) 8)
+    field_print "Size of Stack Commit" ${ohwsf_stack_commit_size} hex2int
+
+    ohwsf_heap_reserve_size=$(get_bytes_le $((88+$(offset_optional_header))) 8)
+    field_print "Size of Heap Reserve" ${ohwsf_heap_reserve_size} hex2int
+
+    ohwsf_heap_commit_size=$(get_bytes_le $((96+$(offset_optional_header))) 8)
+    field_print "Size of Heap Commit" ${ohwsf_heap_commit_size} hex2int
+
+    ohwsf_loader_flags=$(get_bytes_le $((104+$(offset_optional_header))) 4)
+    field_print "Loader flags (Reserved, must be zero)" ${ohwsf_loader_flags}
+
+    ohwsf_nof_rva_and_sizes=$(get_bytes_le $((108+$(offset_optional_header))) 4)
+    field_print "Number of RVA and Sizes" ${ohwsf_nof_rva_and_sizes} hex2int
+
     eyecandy_end
+
+    for data_num in $(seq 1 $(hex2int ${ohwsf_nof_rva_and_sizes})); do
+      eyecandy_start "Optional Header Data Directory number ${data_num} (Image)"
+
+      data_dir_size=128
+
+      ohdd_export_table_addr[${data_num}]=$(get_bytes_le $((112+$((${data_dir_size}*$((${data_num}-1))))+$(offset_optional_header))) 4)
+      ohdd_export_table_size[${data_num}]=$(get_bytes_le $((116+$((${data_dir_size}*$((${data_num}-1))))+$(offset_optional_header))) 4)
+      field_print "Export table Address" ${ohdd_export_table_addr[${data_num}]} hex2int
+      field_print "Export table Size" ${ohdd_export_table_size[${data_num}]} hex2int
+
+      ohdd_import_table_addr[${data_num}]=$(get_bytes_le $((120+$((${data_dir_size}*$((${data_num}-1))))+$(offset_optional_header))) 4)
+      ohdd_import_table_size[${data_num}]=$(get_bytes_le $((124+$((${data_dir_size}*$((${data_num}-1))))+$(offset_optional_header))) 4)
+      field_print "Import table Address" ${ohdd_import_table_addr[${data_num}]} hex2int
+      field_print "Import table Size" ${ohdd_import_table_size[${data_num}]} hex2int
+
+      ohdd_resource_table_addr[${data_num}]=$(get_bytes_le $((128+$((${data_dir_size}*$((${data_num}-1))))+$(offset_optional_header))) 4)
+      ohdd_resource_table_size[${data_num}]=$(get_bytes_le $((132+$((${data_dir_size}*$((${data_num}-1))))+$(offset_optional_header))) 4)
+      field_print "Resource table Address" ${ohdd_resource_table_addr[${data_num}]} hex2int
+      field_print "Resource table Size" ${ohdd_resource_table_size[${data_num}]} hex2int
+
+      ohdd_exception_table_addr[${data_num}]=$(get_bytes_le $((136+$((${data_dir_size}*$((${data_num}-1))))+$(offset_optional_header))) 4)
+      ohdd_exception_table_size[${data_num}]=$(get_bytes_le $((140+$((${data_dir_size}*$((${data_num}-1))))+$(offset_optional_header))) 4)
+      field_print "Exception table Address" ${ohdd_exception_table_addr[${data_num}]} hex2int
+      field_print "Exception table Size" ${ohdd_exception_table_size[${data_num}]} hex2int
+
+      ohdd_certificate_table_addr[${data_num}]=$(get_bytes_le $((144+$((${data_dir_size}*$((${data_num}-1))))+$(offset_optional_header))) 4)
+      ohdd_certificate_table_size[${data_num}]=$(get_bytes_le $((148+$((${data_dir_size}*$((${data_num}-1))))+$(offset_optional_header))) 4)
+      field_print "Certificate table Address" ${ohdd_certificate_table_addr[${data_num}]} hex2int
+      field_print "Certificate table Size" ${ohdd_certificate_table_size[${data_num}]} hex2int
+
+      ohdd_reloc_table_addr[${data_num}]=$(get_bytes_le $((152+$((${data_dir_size}*$((${data_num}-1))))+$(offset_optional_header))) 4)
+      ohdd_reloc_table_size[${data_num}]=$(get_bytes_le $((156+$((${data_dir_size}*$((${data_num}-1))))+$(offset_optional_header))) 4)
+      field_print "Base Relocation table Address" ${ohdd_reloc_table_addr[${data_num}]} hex2int
+      field_print "Base Relocation table Size" ${ohdd_reloc_table_size[${data_num}]} hex2int
+
+      ohdd_debug_table_addr[${data_num}]=$(get_bytes_le $((160+$((${data_dir_size}*$((${data_num}-1))))+$(offset_optional_header))) 4)
+      ohdd_debug_table_size[${data_num}]=$(get_bytes_le $((164+$((${data_dir_size}*$((${data_num}-1))))+$(offset_optional_header))) 4)
+      field_print "Debug table Address" ${ohdd_debug_table_addr[${data_num}]} hex2int
+      field_print "Debug table Size" ${ohdd_debug_table_size[${data_num}]} hex2int
+
+      ohdd_architecture[${data_num}]=$(get_bytes_le $((168+$((${data_dir_size}*$((${data_num}-1))))+$(offset_optional_header))) 8)
+      field_print "Architecture (Reserved, must be zero)" ${ohdd_architecture[${data_num}]} hex2int
+
+      rdata[${data_num}]=$(get_bytes_le $((176+$((${data_dir_size}*$((${data_num}-1))))+$(offset_optional_header))) ${ohdd_export_table_size})
+
+      eyecandy_end
+    done
   fi
 
   eyecandy_end
